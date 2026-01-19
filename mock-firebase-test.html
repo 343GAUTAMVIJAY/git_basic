@@ -10,7 +10,8 @@
 <body>
     <div class="dashboard">
         <header class="header">
-            <h1><i class="fas fa-tachometer-alt"></i> Personal Dashboard - Mock Test</h1>
+            <h1 style="display:inline-block"><i class="fas fa-tachometer-alt"></i> Personal Dashboard - Mock Test</h1>
+            <button style="float:right;margin:12px;" class="btn-primary" onclick="logout()">Logout</button>
         </header>
 
         <!-- Tab Navigation -->
@@ -949,33 +950,75 @@
             documents.forEach(doc => {
                 const item = document.createElement('div');
                 item.className = 'document-item';
-                
+
                 const icon = getFileIcon(doc.type, doc.name);
                 const date = new Date(doc.uploadDate).toLocaleDateString();
                 const size = formatFileSize(doc.size);
-                
-                item.innerHTML = `
-                    <div class="document-header">
-                        <div class="document-icon">${icon}</div>
-                        <div class="document-info">
-                            <div class="document-name" title="${doc.name}">${truncateFileName(doc.name, 30)}</div>
-                            <div class="document-size">${size}</div>
-                            <div class="document-date">Uploaded: ${date}</div>
-                        </div>
-                    </div>
-                    <div class="document-actions">
-                        <button class="action-btn" onclick="openDocument('${doc.url}')" title="Open in new tab">
-                            <i class="fas fa-external-link-alt"></i> Open
-                        </button>
-                        <button class="action-btn" onclick="downloadDocument('${doc.url}', '${doc.name}')" title="Download file">
-                            <i class="fas fa-download"></i> Download
-                        </button>
-                        <button class="action-btn delete" onclick="deleteDocument('${doc.id}', '${doc.storagePath}')" title="Delete file">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </div>
-                `;
-                
+
+                const header = document.createElement('div');
+                header.className = 'document-header';
+
+                const iconWrap = document.createElement('div');
+                iconWrap.className = 'document-icon';
+                iconWrap.innerHTML = icon;
+
+                const info = document.createElement('div');
+                info.className = 'document-info';
+                const nameEl = document.createElement('div');
+                nameEl.className = 'document-name';
+                nameEl.title = doc.name;
+                nameEl.textContent = truncateFileName(doc.name, 30);
+                const sizeEl = document.createElement('div');
+                sizeEl.className = 'document-size';
+                sizeEl.textContent = size;
+                const dateEl = document.createElement('div');
+                dateEl.className = 'document-date';
+                dateEl.textContent = `Uploaded: ${date}`;
+
+                info.appendChild(nameEl);
+                info.appendChild(sizeEl);
+                info.appendChild(dateEl);
+
+                header.appendChild(iconWrap);
+                header.appendChild(info);
+
+                const actions = document.createElement('div');
+                actions.className = 'document-actions';
+
+                const openBtn = document.createElement('button');
+                openBtn.className = 'action-btn';
+                openBtn.title = 'Open in new tab';
+                openBtn.innerHTML = '<i class="fas fa-external-link-alt"></i> Open';
+                openBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openDocument(doc.url);
+                });
+
+                const dlBtn = document.createElement('button');
+                dlBtn.className = 'action-btn';
+                dlBtn.title = 'Download file';
+                dlBtn.innerHTML = '<i class="fas fa-download"></i> Download';
+                dlBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    downloadDocument(doc.url, doc.name);
+                });
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'action-btn delete';
+                delBtn.title = 'Delete file';
+                delBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteDocument(doc.id, doc.storagePath);
+                });
+
+                actions.appendChild(openBtn);
+                actions.appendChild(dlBtn);
+                actions.appendChild(delBtn);
+
+                item.appendChild(header);
+                item.appendChild(actions);
+
                 grid.appendChild(item);
             });
         }
@@ -1707,6 +1750,15 @@
         window.toggleTodo = toggleTodo;
         window.deleteTodo = deleteTodo;
         window.editTodoText = editTodoText;
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authUser');
+            // keep mock data in storage, but remove active user id
+            localStorage.removeItem('userId');
+            // redirect to login
+            window.location.replace('login.html');
+        }
 
         // Git commands for initialization (uncomment to use)
         /*

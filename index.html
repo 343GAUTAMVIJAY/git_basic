@@ -7,21 +7,8 @@
     <script>
       // Route to login or dashboard depending on authentication
       (function(){
-        try {
-          const auth = JSON.parse(localStorage.getItem('authUser') || 'null');
-          const userId = localStorage.getItem('userId');
-          if (auth && auth.email && auth.loggedIn) {
-            window.location.replace('mock-firebase-test.html');
-            return;
-          }
-          if (userId) {
-            // backward compatible: if userId exists, go to dashboard
-            window.location.replace('mock-firebase-test.html');
-            return;
-          }
-        } catch (e) {
-          // ignore and send to login
-        }
+        // Always go to the login page first so users can sign in explicitly.
+        // Dashboard will redirect to login if not authenticated.
         window.location.replace('login.html');
       })();
     </script>
