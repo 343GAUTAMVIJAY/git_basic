@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Login - Personal Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .login-container{max-width:420px;margin:80px auto;padding:24px;border-radius:8px;background:#1f2a36;color:#fff}
+    .login-input{width:100%;padding:10px;margin:8px 0;border-radius:4px;border:1px solid #ccc}
+    .btn-primary{background:#64b5f6;color:#092032;padding:10px 16px;border:none;border-radius:4px;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Sign in</h2>
+    <form id="loginForm">
+      <label>Email</label>
+      <input id="email" class="login-input" type="email" required placeholder="you@example.com">
+      <label>Password</label>
+      <input id="password" class="login-input" type="password" required placeholder="password">
+      <div style="margin-top:12px">
+        <button class="btn-primary" type="submit">Sign in</button>
+      </div>
+      <p style="margin-top:12px;font-size:0.9rem;color:#ddd">Use: gautamgms343@gmail.com / admin</p>
+    </form>
+  </div>
+
+  <script>
+    (function(){
+      const VALID_EMAIL = 'gautamgms343@gmail.com';
+      const VALID_PWD = 'admin';
+      const form = document.getElementById('loginForm');
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const pwd = document.getElementById('password').value;
+        if (email === VALID_EMAIL && pwd === VALID_PWD) {
+          const authUser = { email: email, loggedIn: true };
+          localStorage.setItem('authUser', JSON.stringify(authUser));
+          localStorage.setItem('userId', email);
+          // Redirect to dashboard
+          window.location.replace('mock-firebase-test.html');
+        } else {
+          alert('Invalid credentials');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

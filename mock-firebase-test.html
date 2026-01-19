@@ -226,46 +226,62 @@
             }
         };
 
-            // Local persistence for mock data so state survives refresh
+            // Local persistence for mock data so state survives refresh per user
             const STORAGE_KEY = 'mockDashboardData_v1';
 
             function persistMockData() {
                 try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(mockData));
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    const all = raw ? JSON.parse(raw) : {};
+                    const uid = (authHelper && authHelper.getCurrentUserId && authHelper.getCurrentUserId()) || currentUserId || 'anonymous';
+                    all[uid] = mockData;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
                 } catch (e) {
                     console.error('Failed to persist mockData:', e);
                 }
             }
 
-            function loadMockData() {
+            function loadMockData(userId) {
                 try {
+                    if (!userId) return;
                     const raw = localStorage.getItem(STORAGE_KEY);
                     if (!raw) return;
-                    const parsed = JSON.parse(raw);
-
-                    // Merge parsed data into existing mockData structure to keep defaults
-                    if (parsed && typeof parsed === 'object') {
-                        // shallow merge top-level
-                        Object.keys(parsed).forEach(key => {
-                            mockData[key] = parsed[key];
-                        });
+                    const all = JSON.parse(raw);
+                    if (all && all[userId]) {
+                        // Replace current in-memory mockData with user's saved data
+                        mockData = all[userId];
                     }
                 } catch (e) {
                     console.error('Failed to load persisted mockData:', e);
                 }
             }
 
-            // Load persisted state (if any) immediately so services use saved data
-            loadMockData();
-
         const documentService = {
             uploadDocument: async (userId, file) => {
+                // If file is large, ask user if they'd prefer remote storage
+                const LARGE_LIMIT = 1 * 1024 * 1024; // 1 MB
+                if (file.size > LARGE_LIMIT) {
+                    const useRemote = confirm('This file is larger than 1MB and will be stored locally in your browser.\nDo you want to configure remote storage (Firebase/Google Drive)? Click OK to notify the maintainer.');
+                    if (useRemote) {
+                        ErrorHandler.showNotification('Please tell me which storage to use (Google Drive or Firebase).', 'info');
+                        throw new Error('User requested remote storage');
+                    }
+                }
+
+                // Read file as data URL so it can be opened/downloaded across refreshes
+                const dataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onerror = () => reject(new Error('Failed to read file'));
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+
                 const doc = {
                     id: 'doc_' + Date.now(),
                     name: file.name,
-                    type: file.type,
+                    type: file.type || '',
                     size: file.size,
-                    url: '#',
+                    url: dataUrl,
                     storagePath: `documents/${userId}/${file.name}`,
                     uploadDate: new Date().toISOString()
                 };
@@ -501,6 +517,9 @@
                     currentUserId = 'user_' + Date.now();
                     authHelper.setCurrentUserId(currentUserId);
                 }
+
+                // Load persisted data for this user (if any)
+                try { loadMockData(currentUserId); } catch (e) { console.warn('No persisted data to load for user', currentUserId); }
                 
                 // Initialize auto-save managers for all sections that need it
                 notesAutoSaveManager = new AutoSaveManager(saveNotes, 1000);
@@ -1456,7 +1475,7 @@
                 item.innerHTML = `
                     <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''}
                            onchange="toggleTodo('${todo.id}', this.checked)">
-                    <span class="todo-text" onclick="editTodoText('${todo.id}', this)">${todo.text}</span>
+                    <span class="todo-text" onclick="editTodoText('${todo.id}', this)" style="${todo.completed ? 'text-decoration:line-through;opacity:0.7;' : ''}">${todo.text}</span>
                     <div class="todo-actions">
                         <button class="todo-delete" title="Delete task" onclick="deleteTodo('${todo.id}')">
                             <i class="fas fa-trash"></i>
