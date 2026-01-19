@@ -1552,6 +1552,17 @@
                             ripple.parentNode.removeChild(ripple);
                         }
                     }, 600);
+                    // Update todo text style for strikethrough immediately
+                    const textEl = todoItem.querySelector('.todo-text');
+                    if (textEl) {
+                        if (completed) {
+                            textEl.style.textDecoration = 'line-through';
+                            textEl.style.opacity = '0.7';
+                        } else {
+                            textEl.style.textDecoration = '';
+                            textEl.style.opacity = '1';
+                        }
+                    }
                 }
                 
                 // Update stats
