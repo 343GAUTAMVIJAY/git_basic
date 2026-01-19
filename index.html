@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <header class="header">
+            <h1><i class="fas fa-tachometer-alt"></i> Personal Dashboard</h1>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-navigation">
+            <button class="tab-button active" data-tab="bio">
+                <i class="fas fa-user"></i> Bio
+            </button>
+            <button class="tab-button" data-tab="documents">
+                <i class="fas fa-file"></i> Documents
+            </button>
+            <button class="tab-button" data-tab="links">
+                <i class="fas fa-link"></i> Links & Tools
+            </button>
+            <button class="tab-button" data-tab="notes">
+                <i class="fas fa-sticky-note"></i> Notes
+            </button>
+            <button class="tab-button" data-tab="todo">
+                <i class="fas fa-tasks"></i> To-Do
+            </button>
+        </nav>
+
+        <main class="main-content">
+            <!-- Bio Section -->
+            <section class="tab-content active" id="bio-tab">
+                <div class="card bio-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user"></i> Personal Details</h2>
+                        <button class="btn-add" onclick="addBioField()">
+                            <i class="fas fa-plus"></i> Add Field
+                        </button>
+                    </div>
+                    <div class="bio-table-container">
+                        <table class="bio-table" id="bioTable">
+                            <tbody id="bioTableBody">
+                                <!-- Dynamic content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Documents Section -->
+            <section class="tab-content" id="documents-tab">
+                <div class="card documents-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-file"></i> Documents</h2>
+                    </div>
+                    <div class="upload-area">
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Drag & Drop Files Here</h3>
+                            <p>or click to browse files</p>
+                            <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.gif,.txt,.zip,.rar,.7z">
+                        </div>
+                        <div class="upload-progress" id="uploadProgress">
+                            <div class="upload-progress-bar" id="uploadProgressBar"></div>
+                        </div>
+                        <div class="upload-status" id="uploadStatus"></div>
+                    </div>
+                    <div class="documents-grid" id="documentsGrid">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Links & Tools Section -->
+            <section class="tab-content" id="links-tab">
+                <div class="card links-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-link"></i> Links & Tools</h2>
+                        <button class="btn-add" onclick="showAddLinkModal()">
+                            <i class="fas fa-plus"></i> Add Link
+                        </button>
+                    </div>
+                    <div class="links-grid" id="linksGrid">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notes Section -->
+            <section class="tab-content" id="notes-tab">
+                <div class="card notes-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-sticky-note"></i> Notes</h2>
+                        <div class="notes-status">
+                            <span id="notesSaveStatus">Ready</span>
+                            <span id="notesLastSaved"></span>
+                        </div>
+                    </div>
+                    <textarea id="notesTextarea" placeholder="Write your notes here..." class="notes-textarea"></textarea>
+                    <div class="notes-footer">
+                        <div class="notes-info">
+                            <span id="notesCharCount">0 characters</span>
+                        </div>
+                        <div class="notes-actions">
+                            <button class="btn-clear" id="clearNotesBtn">Clear Notes</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Todo Section -->
+            <section class="tab-content" id="todo-tab">
+                <div class="card todo-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-tasks"></i> To-Do List</h2>
+                        <div class="todo-input-container">
+                            <input type="text" id="todoInput" placeholder="Add a new task..." class="todo-input">
+                            <button class="btn-add" onclick="addTodo()">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="todo-stats">
+                        <span id="todoStats">0 tasks</span>
+                    </div>
+                    <div class="todo-list" id="todoList">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="addLinkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Link</h3>
+                <span class="close" onclick="closeAddLinkModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="linkName" placeholder="Tool/Link Name" class="modal-input">
+                <input type="url" id="linkUrl" placeholder="https://example.com" class="modal-input">
+                <textarea id="linkDescription" placeholder="Optional description" class="modal-textarea"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeAddLinkModal()">Cancel</button>
+                <button class="btn-save" onclick="saveLinkFromModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>

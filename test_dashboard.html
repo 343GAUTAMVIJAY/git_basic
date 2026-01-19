@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Test</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-btn:hover {
+            background: #45a049;
+        }
+        .test-btn.delete {
+            background: #f44336;
+        }
+        .test-btn.delete:hover {
+            background: #d32f2f;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard Functionality Test</h1>
+        
+        <div class="test-section">
+            <h3>Document Upload Test</h3>
+            <input type="file" id="testFileInput" multiple>
+            <div id="uploadResult" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Notes Test</h3>
+            <textarea id="testNotes" placeholder="Test notes functionality here..." rows="4" cols="50"></textarea><br>
+            <button class="test-btn" onclick="testSaveNotes()">Save Notes</button>
+            <button class="test-btn" onclick="testLoadNotes()">Load Notes</button>
+            <div id="notesResult" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Todo Test</h3>
+            <input type="text" id="testTodoInput" placeholder="Enter a test task">
+            <button class="test-btn" onclick="testAddTodo()">Add Todo</button>
+            <button class="test-btn" onclick="testLoadTodos()">Load Todos</button>
+            <div id="todoResult" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Links Test</h3>
+            <input type="text" id="testLinkName" placeholder="Link Name">
+            <input type="text" id="testLinkUrl" placeholder="https://example.com">
+            <button class="test-btn" onclick="testAddLink()">Add Link</button>
+            <button class="test-btn" onclick="testLoadLinks()">Load Links</button>
+            <div id="linksResult" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Bio Test</h3>
+            <input type="text" id="testFieldName" placeholder="Field Name (e.g. Address)">
+            <input type="text" id="testFieldValue" placeholder="Field Value">
+            <button class="test-btn" onclick="testUpdateBio()">Update Bio</button>
+            <button class="test-btn" onclick="testLoadBio()">Load Bio</button>
+            <div id="bioResult" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the services from the actual files
+        import { documentService } from './firebase.services.js';
+        import { noteService } from './firebase.services.js';
+        import { todoService } from './firebase.services.js';
+        import { linkService } from './firebase.services.js';
+        import { bioService } from './firebase.services.js';
+        import { authHelper } from './firebase.services.js';
+        
+        // Mock user ID for testing
+        const testUserId = 'test_user_' + Date.now();
+        authHelper.setCurrentUserId(testUserId);
+        
+        // Document upload test
+        document.getElementById('testFileInput').addEventListener('change', async function(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+            
+            const resultDiv = document.getElementById('uploadResult');
+            resultDiv.style.display = 'block';
+            
+            try {
+                for (const file of files) {
+                    await documentService.uploadDocument(testUserId, file);
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `Successfully uploaded: ${file.name}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error uploading file: ${error.message}`;
+            }
+        });
+        
+        // Notes test functions
+        async function testSaveNotes() {
+            const notes = document.getElementById('testNotes').value;
+            const resultDiv = document.getElementById('notesResult');
+            
+            try {
+                await noteService.saveNotes(testUserId, notes);
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = 'Notes saved successfully!';
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error saving notes: ${error.message}`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        async function testLoadNotes() {
+            const resultDiv = document.getElementById('notesResult');
+            
+            try {
+                const notesData = await noteService.getNotes(testUserId);
+                document.getElementById('testNotes').value = notesData.content || '';
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = 'Notes loaded successfully!';
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error loading notes: ${error.message}`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        // Todo test functions
+        async function testAddTodo() {
+            const text = document.getElementById('testTodoInput').value.trim();
+            if (!text) {
+                alert('Please enter a todo text');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('todoResult');
+            
+            try {
+                const todo = await todoService.addTodo(testUserId, text);
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `Todo added with ID: ${todo.id}`;
+                resultDiv.style.display = 'block';
+                document.getElementById('testTodoInput').value = '';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error adding todo: ${error.message}`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        async function testLoadTodos() {
+            const resultDiv = document.getElementById('todoResult');
+            
+            try {
+                const todos = await todoService.getUserTodos(testUserId);
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `Loaded ${todos.length} todos`;
+                resultDiv.style.display = 'block';
+                
+                // Display todos in a simple list
+                if (todos.length > 0) {
+                    const todoList = document.createElement('ul');
+                    todos.forEach(todo => {
+                        const li = document.createElement('li');
+                        li.textContent = `${todo.text} (${todo.completed ? 'completed' : 'pending'})`;
+                        todoList.appendChild(li);
+                    });
+                    resultDiv.appendChild(todoList);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error loading todos: ${error.message}`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        // Link test functions
+        async function testAddLink() {
+            const name = document.getElementById('testLinkName').value.trim();
+            const url = document.getElementById('testLinkUrl').value.trim();
+            
+            if (!name || !url) {
+                alert('Please enter both link name and URL');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('linksResult');
+            
+            try {
+                const link = await linkService.addLink(testUserId, { name, url });
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `Link added with ID: ${link.id}`;
+                resultDiv.style.display = 'block';
+                document.getElementById('testLinkName').value = '';
+                document.getElementById('testLinkUrl').value = '';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error adding link: ${error.message}`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        async function testLoadLinks() {
+            const resultDiv = document.getElementById('linksResult');
+            
+            try {
+                const links = await linkService.getUserLinks(testUserId);
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `Loaded ${links.length} links`;
+                resultDiv.style.display = 'block';
+                
+                // Display links in a simple list
+                if (links.length > 0) {
+                    const linkList = document.createElement('ul');
+                    links.forEach(link => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<a href="${link.url}" target="_blank">${link.name}</a>`;
+                        linkList.appendChild(li);
+                    });
+                    resultDiv.appendChild(linkList);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error loading links: ${error.message}`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        // Bio test functions
+        async function testUpdateBio() {
+            const fieldName = document.getElementById('testFieldName').value.trim();
+            const fieldValue = document.getElementById('testFieldValue').value.trim();
+            
+            if (!fieldName) {
+                alert('Please enter a field name');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('bioResult');
+            
+            try {
+                // Get current bio and update the specific field
+                const bioData = await bioService.getBio(testUserId);
+                bioData.fields[fieldName] = fieldValue;
+                await bioService.updateBio(testUserId, bioData.fields);
+                
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `Bio field '${fieldName}' updated successfully!`;
+                resultDiv.style.display = 'block';
+                document.getElementById('testFieldName').value = '';
+                document.getElementById('testFieldValue').value = '';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error updating bio: ${error.message}`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        async function testLoadBio() {
+            const resultDiv = document.getElementById('bioResult');
+            
+            try {
+                const bioData = await bioService.getBio(testUserId);
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = 'Bio loaded successfully!';
+                resultDiv.style.display = 'block';
+                
+                // Display bio fields in a simple list
+                if (bioData.fields && Object.keys(bioData.fields).length > 0) {
+                    const bioList = document.createElement('ul');
+                    for (const [key, value] of Object.entries(bioData.fields)) {
+                        const li = document.createElement('li');
+                        li.textContent = `${key}: ${value}`;
+                        bioList.appendChild(li);
+                    }
+                    resultDiv.appendChild(bioList);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error loading bio: ${error.message}`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        // Expose functions to global scope for the buttons to access
+        window.testSaveNotes = testSaveNotes;
+        window.testLoadNotes = testLoadNotes;
+        window.testAddTodo = testAddTodo;
+        window.testLoadTodos = testLoadTodos;
+        window.testAddLink = testAddLink;
+        window.testLoadLinks = testLoadLinks;
+        window.testUpdateBio = testUpdateBio;
+        window.testLoadBio = testLoadBio;
+    </script>
+</body>
+</html>
