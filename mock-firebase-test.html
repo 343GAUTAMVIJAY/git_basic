@@ -1075,14 +1075,66 @@
         }
 
         function openDocument(url) {
-            window.open(url, '_blank');
+            if (url.startsWith('data:')) {
+                // Handle data URLs by converting to blob for better browser support
+                try {
+                    const arr = url.split(',');
+                    const mime = arr[0].match(/:(.*?);/)[1];
+                    const bstr = atob(arr[1]);
+                    let n = bstr.length;
+                    const u8arr = new Uint8Array(n);
+                    while (n--) {
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    const blob = new Blob([u8arr], { type: mime });
+                    const blobUrl = URL.createObjectURL(blob);
+                    window.open(blobUrl, '_blank');
+                    // Don't revoke for opening, as the new tab needs the URL
+                } catch (error) {
+                    console.error('Error opening data URL:', error);
+                    // Fallback to direct data URL
+                    window.open(url, '_blank');
+                }
+            } else {
+                // Regular URL
+                window.open(url, '_blank');
+            }
         }
 
         function downloadDocument(url, filename) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
+            if (url.startsWith('data:')) {
+                // Handle data URLs by converting to blob
+                try {
+                    const arr = url.split(',');
+                    const mime = arr[0].match(/:(.*?);/)[1];
+                    const bstr = atob(arr[1]);
+                    let n = bstr.length;
+                    const u8arr = new Uint8Array(n);
+                    while (n--) {
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    const blob = new Blob([u8arr], { type: mime });
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = filename;
+                    a.click();
+                    URL.revokeObjectURL(blobUrl);
+                } catch (error) {
+                    console.error('Error downloading data URL:', error);
+                    // Fallback to direct data URL
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+                }
+            } else {
+                // Regular URL
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+            }
         }
 
         async function deleteDocument(docId, storagePath) {
@@ -1116,7 +1168,7 @@
 
         async function saveLinkFromModal() {
             const name = document.getElementById('linkName').value.trim();
-            const url = document.getElementById('linkUrl').value.trim();
+            let url = document.getElementById('linkUrl').value.trim();
             const description = document.getElementById('linkDescription').value.trim();
             
             // Validation
@@ -1128,6 +1180,11 @@
             if (!url) {
                 ErrorHandler.showNotification('Please enter a URL', 'error');
                 return;
+            }
+            
+            // Add https:// if no protocol is specified
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
             }
             
             // Basic URL validation
