@@ -101,6 +101,17 @@ async function handleFileUpload(event) {
         
         for (const file of files) {
             const fileId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // For images, create a data URL for preview
+            let fileUrl = '#';
+            if (file.type.startsWith('image/')) {
+                fileUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+            
             const fileData = {
                 id: fileId,
                 userId: userId,
@@ -108,7 +119,7 @@ async function handleFileUpload(event) {
                 type: file.type,
                 size: file.size,
                 uploadDate: new Date().toISOString(),
-                url: '#',
+                url: fileUrl,
                 storagePath: 'local_' + fileId
             };
             documents.push(fileData);
@@ -196,7 +207,15 @@ function openDocument(url) {
         alert('File preview not available in demo mode');
         return;
     }
-    window.open(url, '_blank');
+    
+    // For data URLs (uploaded images), open in new tab
+    if (url.startsWith('data:')) {
+        const newWindow = window.open();
+        newWindow.document.write(`<img src="${url}" style="max-width:100%;max-height:100%;object-fit:contain;">`);
+        newWindow.document.title = 'Document Preview';
+    } else {
+        window.open(url, '_blank');
+    }
 }
 
 function downloadDocument(url, filename) {
@@ -204,10 +223,13 @@ function downloadDocument(url, filename) {
         alert('File download not available in demo mode');
         return;
     }
+    
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
 }
 
 async function deleteDocument(docId) {
@@ -484,7 +506,7 @@ function previewImage(url, filename) {
                 <span class="close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</span>
             </div>
             <div class="image-preview-body">
-                <img src="${url}" alt="${filename}" style="max-width: 100%; max-height: 80vh; object-fit: contain;">
+                <img src="${url}" alt="${filename}" style="max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px;">
             </div>
         </div>
     `;
@@ -495,20 +517,22 @@ function previewImage(url, filename) {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.8);
+        background: rgba(0,0,0,0.9);
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 10000;
+        backdrop-filter: blur(5px);
     `;
     
     modal.querySelector('.image-preview-content').style.cssText = `
-        background: #560064;
-        border-radius: 12px;
+        background: linear-gradient(135deg, #560064 0%, #3d0047 100%);
+        border-radius: 16px;
         max-width: 90%;
         max-height: 90%;
         overflow: hidden;
         border: 1px solid #c084fc;
+        box-shadow: 0 20px 60px rgba(86, 0, 100, 0.5);
     `;
     
     modal.querySelector('.image-preview-header').style.cssText = `
@@ -516,27 +540,38 @@ function previewImage(url, filename) {
         justify-content: space-between;
         align-items: center;
         padding: 15px 20px;
-        background: #3d0047;
+        background: rgba(192, 132, 252, 0.1);
         color: #c084fc;
-        border-bottom: 1px solid #c084fc;
+        border-bottom: 1px solid rgba(192, 132, 252, 0.2);
     `;
     
     modal.querySelector('.close').style.cssText = `
-        font-size: 24px;
+        font-size: 28px;
         cursor: pointer;
         color: #c084fc;
+        transition: color 0.3s ease;
     `;
     
     modal.querySelector('.image-preview-body').style.cssText = `
         padding: 20px;
         text-align: center;
+        background: rgba(0,0,0,0.2);
     `;
     
     document.body.appendChild(modal);
     
+    // Close on click outside
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.remove();
+        }
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function escapeHandler(e) {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', escapeHandler);
         }
     });
 }

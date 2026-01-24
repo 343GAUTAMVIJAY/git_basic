@@ -10,7 +10,7 @@
 <body>
     <div class="dashboard">
         <header class="header">
-            <h1 style="display:inline-block"><i class="fas fa-tachometer-alt"></i> Personal Dashboard - Mock Test</h1>
+            <h1 style="display:inline-block" id="dashboardHeader"><i class="fas fa-tachometer-alt"></i> <span id="dashboardTitle">Personal Dashboard - Mock Test</span></h1>
             <button style="float:right;margin:12px;" class="btn-primary" onclick="logout()">Logout</button>
         </header>
 
@@ -30,6 +30,9 @@
             </button>
             <button class="tab-button" data-tab="todo">
                 <i class="fas fa-tasks"></i> To-Do
+            </button>
+            <button class="tab-button" data-tab="settings">
+                <i class="fas fa-cog"></i> Settings
             </button>
         </nav>
 
@@ -131,6 +134,52 @@
                     </div>
                     <div class="todo-list" id="todoList">
                         <!-- Dynamic content -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section class="tab-content" id="settings-tab">
+                <div class="card settings-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-cog"></i> Settings</h2>
+                    </div>
+                    <div style="padding:20px">
+                        <div style="margin-bottom:30px">
+                            <h3 style="margin-bottom:15px;color:#64b5f6"><i class="fas fa-heading"></i> Dashboard Name</h3>
+                            <input type="text" id="dashboardName" placeholder="Enter dashboard name" class="modal-input" style="max-width:500px">
+                            <button class="btn-primary" onclick="saveDashboardName()" style="margin-top:10px">
+                                <i class="fas fa-save"></i> Save Name
+                            </button>
+                        </div>
+                        <div style="margin-bottom:30px">
+                            <h3 style="margin-bottom:15px;color:#64b5f6"><i class="fas fa-key"></i> Change Password</h3>
+                            <div style="max-width:500px">
+                                <input type="password" id="currentPassword" placeholder="Current password" class="modal-input" style="margin-bottom:10px">
+                                <input type="password" id="newPassword" placeholder="New password" class="modal-input" style="margin-bottom:10px">
+                                <input type="password" id="confirmPassword" placeholder="Confirm new password" class="modal-input" style="margin-bottom:10px">
+                                <button class="btn-primary" onclick="changePassword()">
+                                    <i class="fas fa-lock"></i> Change Password
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-bottom:30px">
+                            <h3 style="margin-bottom:15px;color:#64b5f6"><i class="fas fa-database"></i> Data Management</h3>
+                            <p style="color:#ccc;margin-bottom:10px">Export your data to use on another device or as backup</p>
+                            <button class="btn-primary" onclick="exportData()" style="margin-right:10px">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button class="btn-primary" onclick="importData()">
+                                <i class="fas fa-upload"></i> Import Data
+                            </button>
+                            <input type="file" id="importFileInput" accept=".json" style="display:none">
+                        </div>
+                        <div>
+                            <h3 style="margin-bottom:15px;color:#e74c3c"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+                            <button class="btn-primary" onclick="clearAllData()" style="background:#e74c3c">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -538,6 +587,9 @@
         async function initializeApp() {
             LoadingManager.showLoading(true);
             try {
+                // Load settings first
+                await loadSettings();
+                
                 // Load all data sections with individual error handling
                 await Promise.all([
                     loadBioData(),
@@ -1264,6 +1316,7 @@
             links.forEach(link => {
                 const item = document.createElement('div');
                 item.className = 'link-item';
+                item.style.cursor = 'pointer';
                 
                 item.innerHTML = `
                     <div class="link-content">
@@ -1282,6 +1335,14 @@
                         </button>
                     </div>
                 `;
+                
+                // Make entire card clickable to open link in new tab
+                item.addEventListener('click', function(e) {
+                    // Don't open if clicking on delete button or the link itself
+                    if (!e.target.closest('.link-delete') && !e.target.closest('a')) {
+                        window.open(link.url, '_blank');
+                    }
+                });
                 
                 grid.appendChild(item);
             });
@@ -1807,6 +1868,271 @@
         window.toggleTodo = toggleTodo;
         window.deleteTodo = deleteTodo;
         window.editTodoText = editTodoText;
+
+        // Settings Functions
+        async function loadSettings() {
+            try {
+                const userProfile = getUserProfile();
+                
+                // Load dashboard name
+                const dashboardTitle = document.getElementById('dashboardTitle');
+                const dashboardNameInput = document.getElementById('dashboardName');
+                if (userProfile.dashboardName) {
+                    dashboardTitle.textContent = userProfile.dashboardName;
+                    dashboardNameInput.value = userProfile.dashboardName;
+                } else {
+                    dashboardNameInput.value = 'Personal Dashboard - Mock Test';
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        function getUserProfile() {
+            const PROFILE_KEY = 'userProfiles_v1';
+            try {
+                const profiles = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+                const userEmail = currentUserId || 'default';
+                if (!profiles[userEmail]) {
+                    profiles[userEmail] = {
+                        email: userEmail,
+                        password: 'admin',
+                        dashboardName: 'Personal Dashboard - Mock Test'
+                    };
+                    localStorage.setItem(PROFILE_KEY, JSON.stringify(profiles));
+                }
+                return profiles[userEmail];
+            } catch (error) {
+                console.error('Error getting user profile:', error);
+                return { email: currentUserId, password: 'admin', dashboardName: 'Personal Dashboard - Mock Test' };
+            }
+        }
+
+        function updateUserProfile(updates) {
+            const PROFILE_KEY = 'userProfiles_v1';
+            try {
+                const profiles = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+                const userEmail = currentUserId || 'default';
+                profiles[userEmail] = { ...profiles[userEmail], ...updates };
+                localStorage.setItem(PROFILE_KEY, JSON.stringify(profiles));
+                return true;
+            } catch (error) {
+                console.error('Error updating user profile:', error);
+                return false;
+            }
+        }
+
+        async function saveDashboardName() {
+            const nameInput = document.getElementById('dashboardName');
+            const newName = nameInput.value.trim();
+            
+            if (!newName) {
+                ErrorHandler.showNotification('Please enter a dashboard name', 'error');
+                return;
+            }
+            
+            try {
+                LoadingManager.showLoading(true);
+                
+                // Update profile
+                updateUserProfile({ dashboardName: newName });
+                
+                // Update header
+                document.getElementById('dashboardTitle').textContent = newName;
+                
+                ErrorHandler.showNotification('Dashboard name updated successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'saving dashboard name');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        async function changePassword() {
+            const currentPwd = document.getElementById('currentPassword').value;
+            const newPwd = document.getElementById('newPassword').value;
+            const confirmPwd = document.getElementById('confirmPassword').value;
+            
+            if (!currentPwd || !newPwd || !confirmPwd) {
+                ErrorHandler.showNotification('Please fill all password fields', 'error');
+                return;
+            }
+            
+            if (newPwd !== confirmPwd) {
+                ErrorHandler.showNotification('New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPwd.length < 4) {
+                ErrorHandler.showNotification('Password must be at least 4 characters', 'error');
+                return;
+            }
+            
+            try {
+                LoadingManager.showLoading(true);
+                
+                // Verify current password
+                const userProfile = getUserProfile();
+                if (userProfile.password !== currentPwd) {
+                    ErrorHandler.showNotification('Current password is incorrect', 'error');
+                    return;
+                }
+                
+                // Update password
+                updateUserProfile({ password: newPwd });
+                
+                // Clear inputs
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                
+                ErrorHandler.showNotification('Password changed successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'changing password');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        function exportData() {
+            try {
+                const STORAGE_KEY = 'mockDashboardData_v1';
+                const PROFILE_KEY = 'userProfiles_v1';
+                
+                const allData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                const allProfiles = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+                
+                const userData = allData[currentUserId] || {};
+                const userProfile = allProfiles[currentUserId] || {};
+                
+                const exportData = {
+                    email: currentUserId,
+                    profile: userProfile,
+                    data: userData,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `dashboard-backup-${currentUserId.split('@')[0]}-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                
+                URL.revokeObjectURL(url);
+                
+                ErrorHandler.showNotification('Data exported successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'exporting data');
+            }
+        }
+
+        function importData() {
+            const fileInput = document.getElementById('importFileInput');
+            fileInput.click();
+            
+            fileInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    LoadingManager.showLoading(true);
+                    
+                    const text = await file.text();
+                    const importedData = JSON.parse(text);
+                    
+                    if (!importedData.data || !importedData.profile) {
+                        throw new Error('Invalid backup file format');
+                    }
+                    
+                    const confirmed = confirm(`Import data from ${importedData.email}?\\nThis will overwrite your current data for this account.`);
+                    if (!confirmed) {
+                        LoadingManager.showLoading(false);
+                        return;
+                    }
+                    
+                    // Import data
+                    const STORAGE_KEY = 'mockDashboardData_v1';
+                    const PROFILE_KEY = 'userProfiles_v1';
+                    
+                    const allData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                    const allProfiles = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+                    
+                    allData[currentUserId] = importedData.data;
+                    allProfiles[currentUserId] = importedData.profile;
+                    
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+                    localStorage.setItem(PROFILE_KEY, JSON.stringify(allProfiles));
+                    
+                    // Reload data
+                    loadMockData(currentUserId);
+                    
+                    // Reload all sections
+                    clearCache();
+                    await initializeApp();
+                    await loadSettings();
+                    
+                    ErrorHandler.showNotification('Data imported successfully! Refreshing...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } catch (error) {
+                    ErrorHandler.handle(error, 'importing data');
+                } finally {
+                    LoadingManager.showLoading(false);
+                    fileInput.value = '';
+                }
+            };
+        }
+
+        function clearAllData() {
+            const confirmed = confirm('⚠️ WARNING: This will permanently delete ALL your data!\\n\\nThis action cannot be undone.\\n\\nAre you sure?');
+            if (!confirmed) return;
+            
+            const doubleConfirm = confirm('This is your last chance!\\n\\nType your email to confirm deletion, or click Cancel.');
+            if (!doubleConfirm) return;
+            
+            try {
+                LoadingManager.showLoading(true);
+                
+                const STORAGE_KEY = 'mockDashboardData_v1';
+                const allData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                delete allData[currentUserId];
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+                
+                // Reset mock data
+                mockData = {
+                    bio: { fields: {} },
+                    documents: [],
+                    links: [],
+                    notes: { content: '', lastUpdated: new Date().toISOString() },
+                    todos: []
+                };
+                
+                persistMockData();
+                clearCache();
+                
+                ErrorHandler.showNotification('All data cleared', 'success');
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } catch (error) {
+                ErrorHandler.handle(error, 'clearing data');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        // Make settings functions globally available
+        window.saveDashboardName = saveDashboardName;
+        window.changePassword = changePassword;
+        window.exportData = exportData;
+        window.importData = importData;
+        window.clearAllData = clearAllData;
 
         // Logout function
         function logout() {
