@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Firebase Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <header class="header">
+            <h1 style="display:inline-block" id="dashboardHeader"><i class="fas fa-tachometer-alt"></i> <span id="dashboardTitle">Personal Dashboard - Mock Test</span></h1>
+            <button style="float:right;margin:12px;" class="btn-primary" onclick="logout()">Logout</button>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-navigation">
+            <button class="tab-button active" data-tab="bio">
+                <i class="fas fa-user"></i> Bio
+            </button>
+            <button class="tab-button" data-tab="documents">
+                <i class="fas fa-file"></i> Documents
+            </button>
+            <button class="tab-button" data-tab="links">
+                <i class="fas fa-link"></i> Links & Tools
+            </button>
+            <button class="tab-button" data-tab="notes">
+                <i class="fas fa-sticky-note"></i> Notes
+            </button>
+            <button class="tab-button" data-tab="todo">
+                <i class="fas fa-tasks"></i> To-Do
+            </button>
+            <button class="tab-button" data-tab="settings">
+                <i class="fas fa-cog"></i> Settings
+            </button>
+        </nav>
+
+        <main class="main-content">
+            <!-- Bio Section -->
+            <section class="tab-content active" id="bio-tab">
+                <div class="card bio-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user"></i> Personal Details</h2>
+                        <button class="btn-add" onclick="addBioField()">
+                            <i class="fas fa-plus"></i> Add Field
+                        </button>
+                    </div>
+                    <div class="bio-table-container">
+                        <table class="bio-table" id="bioTable">
+                            <tbody id="bioTableBody">
+                                <!-- Dynamic content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Documents Section -->
+            <section class="tab-content" id="documents-tab">
+                <div class="card documents-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-file"></i> Documents</h2>
+                    </div>
+                    <div class="upload-area">
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Drag & Drop Files Here</h3>
+                            <p>or click to browse files</p>
+                            <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.gif,.txt,.zip,.rar,.7z">
+                        </div>
+                        <div class="upload-progress" id="uploadProgress">
+                            <div class="upload-progress-bar" id="uploadProgressBar"></div>
+                        </div>
+                        <div class="upload-status" id="uploadStatus"></div>
+                    </div>
+                    <div class="documents-grid" id="documentsGrid">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Links & Tools Section -->
+            <section class="tab-content" id="links-tab">
+                <div class="card links-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-link"></i> Links & Tools</h2>
+                        <button class="btn-add" onclick="showAddLinkModal()">
+                            <i class="fas fa-plus"></i> Add Link
+                        </button>
+                    </div>
+                    <div class="links-grid" id="linksGrid">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notes Section -->
+            <section class="tab-content" id="notes-tab">
+                <div class="card notes-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-sticky-note"></i> Notes</h2>
+                        <div class="notes-status">
+                            <span id="notesSaveStatus">Ready</span>
+                            <span id="notesLastSaved"></span>
+                        </div>
+                    </div>
+                    <textarea id="notesTextarea" placeholder="Write your notes here..." class="notes-textarea"></textarea>
+                    <div class="notes-footer">
+                        <div class="notes-info">
+                            <span id="notesCharCount">0 characters</span>
+                        </div>
+                        <div class="notes-actions">
+                            <button class="btn-clear" id="clearNotesBtn">Clear Notes</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Todo Section -->
+            <section class="tab-content" id="todo-tab">
+                <div class="card todo-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-tasks"></i> To-Do List</h2>
+                        <div class="todo-input-container">
+                            <input type="text" id="todoInput" placeholder="Add a new task..." class="todo-input">
+                            <button class="btn-add" onclick="addTodo()">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="todo-stats">
+                        <span id="todoStats">0 tasks</span>
+                    </div>
+                    <div class="todo-list" id="todoList">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section class="tab-content" id="settings-tab">
+                <div class="card settings-section">
+                    <div class="card-header">
+                        <h2><i class="fas fa-cog"></i> Settings</h2>
+                    </div>
+                    <div style="padding:20px">
+                        <div style="margin-bottom:30px">
+                            <h3 style="margin-bottom:15px;color:#64b5f6"><i class="fas fa-heading"></i> Dashboard Name</h3>
+                            <input type="text" id="dashboardName" placeholder="Enter dashboard name" class="modal-input" style="max-width:500px">
+                            <button class="btn-primary" onclick="saveDashboardName()" style="margin-top:10px">
+                                <i class="fas fa-save"></i> Save Name
+                            </button>
+                        </div>
+                        <div style="margin-bottom:30px">
+                            <h3 style="margin-bottom:15px;color:#64b5f6"><i class="fas fa-key"></i> Change Password</h3>
+                            <div style="max-width:500px">
+                                <input type="password" id="currentPassword" placeholder="Current password" class="modal-input" style="margin-bottom:10px">
+                                <input type="password" id="newPassword" placeholder="New password" class="modal-input" style="margin-bottom:10px">
+                                <input type="password" id="confirmPassword" placeholder="Confirm new password" class="modal-input" style="margin-bottom:10px">
+                                <button class="btn-primary" onclick="changePassword()">
+                                    <i class="fas fa-lock"></i> Change Password
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-bottom:30px">
+                            <h3 style="margin-bottom:15px;color:#64b5f6"><i class="fas fa-database"></i> Data Management</h3>
+                            <p style="color:#ccc;margin-bottom:10px">Export your data to use on another device or as backup</p>
+                            <button class="btn-primary" onclick="exportData()" style="margin-right:10px">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button class="btn-primary" onclick="importData()">
+                                <i class="fas fa-upload"></i> Import Data
+                            </button>
+                            <input type="file" id="importFileInput" accept=".json" style="display:none">
+                        </div>
+                        <div>
+                            <h3 style="margin-bottom:15px;color:#e74c3c"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+                            <button class="btn-primary" onclick="clearAllData()" style="background:#e74c3c">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="addLinkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Link</h3>
+                <span class="close" onclick="closeAddLinkModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="linkName" placeholder="Tool/Link Name" class="modal-input">
+                <input type="url" id="linkUrl" placeholder="https://example.com" class="modal-input">
+                <textarea id="linkDescription" placeholder="Optional description" class="modal-textarea"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeAddLinkModal()">Cancel</button>
+                <button class="btn-save" onclick="saveLinkFromModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // Mock implementations to test functionality without Firebase
+        let mockData = {
+            bio: {
+                fields: {
+                    'Name': 'John Doe',
+                    'Email': 'john@example.com',
+                    'Phone': '+1234567890',
+                    'Location': 'New York, USA',
+                    'Bio': 'Software developer with 5 years of experience'
+                }
+            },
+            documents: [
+                {
+                    id: 'doc1',
+                    name: 'resume.pdf',
+                    type: 'application/pdf',
+                    size: 102400,
+                    url: '#',
+                    storagePath: 'documents/test/resume.pdf',
+                    uploadDate: new Date().toISOString()
+                }
+            ],
+            links: [
+                {
+                    id: 'link1',
+                    name: 'GitHub Profile',
+                    url: 'https://github.com',
+                    description: 'My GitHub profile'
+                }
+            ],
+            notes: {
+                content: 'This is a sample note to test the functionality.',
+                lastUpdated: new Date().toISOString()
+            },
+            todos: [
+                {
+                    id: 'todo1',
+                    text: 'Complete dashboard testing',
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                }
+            ]
+        };
+
+        // Mock services
+        const bioService = {
+            getBio: async (userId) => {
+                return mockData.bio;
+            },
+            updateBio: async (userId, fields) => {
+                mockData.bio.fields = fields;
+                try { persistMockData(); } catch (e) {}
+                return { success: true, message: 'Bio updated successfully' };
+            },
+            addBioField: async (userId, fieldName, value = '') => {
+                mockData.bio.fields[fieldName] = value;
+                try { persistMockData(); } catch (e) {}
+                return { success: true, message: 'Field added successfully' };
+            },
+            deleteBioField: async (userId, fieldName) => {
+                delete mockData.bio.fields[fieldName];
+                try { persistMockData(); } catch (e) {}
+                return { success: true, message: 'Field deleted successfully' };
+            }
+        };
+
+            // Local persistence for mock data so state survives refresh per user
+            const STORAGE_KEY = 'mockDashboardData_v1';
+
+            function persistMockData() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    const all = raw ? JSON.parse(raw) : {};
+                    const uid = (authHelper && authHelper.getCurrentUserId && authHelper.getCurrentUserId()) || currentUserId || 'anonymous';
+                    all[uid] = mockData;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+                } catch (e) {
+                    console.error('Failed to persist mockData:', e);
+                }
+            }
+
+            function loadMockData(userId) {
+                try {
+                    if (!userId) return;
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (!raw) return;
+                    const all = JSON.parse(raw);
+                    if (all && all[userId]) {
+                        // Replace current in-memory mockData with user's saved data
+                        mockData = all[userId];
+                    }
+                } catch (e) {
+                    console.error('Failed to load persisted mockData:', e);
+                }
+            }
+
+        const documentService = {
+            uploadDocument: async (userId, file) => {
+                // If file is large, ask user if they'd prefer remote storage
+                const LARGE_LIMIT = 1 * 1024 * 1024; // 1 MB
+                if (file.size > LARGE_LIMIT) {
+                    const useRemote = confirm('This file is larger than 1MB and will be stored locally in your browser.\nDo you want to configure remote storage (Firebase/Google Drive)? Click OK to notify the maintainer.');
+                    if (useRemote) {
+                        ErrorHandler.showNotification('Please tell me which storage to use (Google Drive or Firebase).', 'info');
+                        throw new Error('User requested remote storage');
+                    }
+                }
+
+                // Read file as data URL so it can be opened/downloaded across refreshes
+                const dataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onerror = () => reject(new Error('Failed to read file'));
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+
+                const doc = {
+                    id: 'doc_' + Date.now(),
+                    name: file.name,
+                    type: file.type || '',
+                    size: file.size,
+                    url: dataUrl,
+                    storagePath: `documents/${userId}/${file.name}`,
+                    uploadDate: new Date().toISOString()
+                };
+                mockData.documents.push(doc);
+                try { persistMockData(); } catch (e) {}
+                return doc;
+            },
+            getUserDocuments: async (userId) => {
+                return mockData.documents;
+            },
+            deleteDocument: async (userId, docId, storagePath) => {
+                mockData.documents = mockData.documents.filter(doc => doc.id !== docId);
+                try { persistMockData(); } catch (e) {}
+                return { success: true, message: 'Document deleted successfully' };
+            }
+        };
+
+        const linkService = {
+            addLink: async (userId, linkData) => {
+                const link = {
+                    id: 'link_' + Date.now(),
+                    ...linkData
+                };
+                mockData.links.push(link);
+                try { persistMockData(); } catch (e) {}
+                return link;
+            },
+            getUserLinks: async (userId) => {
+                return mockData.links;
+            },
+            deleteLink: async (userId, linkId) => {
+                mockData.links = mockData.links.filter(link => link.id !== linkId);
+                try { persistMockData(); } catch (e) {}
+                return { success: true, message: 'Link deleted successfully' };
+            }
+        };
+
+        const noteService = {
+            getNotes: async (userId) => {
+                return mockData.notes;
+            },
+            saveNotes: async (userId, content) => {
+                mockData.notes.content = content;
+                mockData.notes.lastUpdated = new Date().toISOString();
+                try { persistMockData(); } catch (e) {}
+                return { success: true, message: 'Notes saved successfully' };
+            }
+        };
+
+        const todoService = {
+            addTodo: async (userId, text) => {
+                const todo = {
+                    id: 'todo_' + Date.now(),
+                    text: text,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                mockData.todos.push(todo);
+                try { persistMockData(); } catch (e) {}
+                return todo;
+            },
+            getUserTodos: async (userId) => {
+                return mockData.todos;
+            },
+            updateTodo: async (todoId, completed) => {
+                const todo = mockData.todos.find(t => t.id === todoId);
+                if (todo) {
+                    todo.completed = completed;
+                }
+                try { persistMockData(); } catch (e) {}
+                return { id: todoId, completed: completed, success: true };
+            },
+            updateTodoText: async (todoId, text) => {
+                const todo = mockData.todos.find(t => t.id === todoId);
+                if (todo) {
+                    todo.text = text;
+                }
+                try { persistMockData(); } catch (e) {}
+                return { id: todoId, text: text, success: true };
+            },
+            deleteTodo: async (userId, todoId) => {
+                mockData.todos = mockData.todos.filter(todo => todo.id !== todoId);
+                try { persistMockData(); } catch (e) {}
+                return { success: true, message: 'Todo deleted successfully' };
+            }
+        };
+
+        const authHelper = {
+            getCurrentUserId: () => {
+                return localStorage.getItem('userId') || 'test_user_123';
+            },
+            setCurrentUserId: (userId) => {
+                localStorage.setItem('userId', userId);
+            }
+        };
+
+        // Mock loading manager
+        const LoadingManager = {
+            showLoading: (show) => {
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) {
+                    overlay.style.display = show ? 'flex' : 'none';
+                }
+            }
+        };
+
+        // Mock error handler
+        const ErrorHandler = {
+            handle: (error, context) => {
+                console.error(`Error in ${context}:`, error);
+                alert(`Error in ${context}: ${error.message || error}`);
+            },
+            showNotification: (message, type) => {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.textContent = message;
+                
+                // Add styles
+                Object.assign(notification.style, {
+                    position: 'fixed',
+                    top: '20px',
+                    right: '20px',
+                    padding: '15px 20px',
+                    borderRadius: '5px',
+                    color: 'white',
+                    zIndex: '10000',
+                    maxWidth: '400px',
+                    wordWrap: 'break-word',
+                    boxShadow: '0 4px 6px rgba(0,0,0.1)',
+                    animation: 'slideIn 0.3s ease-out',
+                    cursor: 'pointer'
+                });
+                
+                // Set background color based on type
+                if (type === 'error') {
+                    notification.style.backgroundColor = '#e74c3c';
+                } else if (type === 'success') {
+                    notification.style.backgroundColor = '#2ecc71';
+                } else {
+                    notification.style.backgroundColor = '#3498db';
+                }
+                
+                // Add click to dismiss functionality
+                notification.addEventListener('click', () => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                });
+                
+                // Add to document
+                document.body.appendChild(notification);
+                
+                // Remove after delay (unless it's an error which should stay until dismissed)
+                if (type !== 'error') {
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 5000);
+                }
+            }
+        };
+
+        // Mock auto-save manager
+        class AutoSaveManager {
+            constructor(saveFunction, delay = 1000) {
+                this.saveFunction = saveFunction;
+                this.delay = delay;
+                this.timeoutId = null;
+            }
+            
+            trigger() {
+                if (this.timeoutId) {
+                    clearTimeout(this.timeoutId);
+                }
+                
+                this.timeoutId = setTimeout(() => {
+                    this.saveFunction();
+                    this.timeoutId = null;
+                }, this.delay);
+            }
+            
+            cancel() {
+                if (this.timeoutId) {
+                    clearTimeout(this.timeoutId);
+                    this.timeoutId = null;
+                }
+            }
+        }
+
+        // Global variables
+        let notesAutoSaveManager;
+        let bioAutoSaveManager;
+        let currentUserId = null;
+        let notesSaveStatus = 'ready';
+
+        // Data cache to improve performance
+        const dataCache = {
+            bio: null,
+            documents: null,
+            links: null,
+            notes: null,
+            todos: null,
+            lastUpdated: {}
+        };
+
+        // Cache timeout in milliseconds (5 minutes)
+        const CACHE_TIMEOUT = 5 * 60 * 1000;
+
+        // Function to clear specific cache or all caches
+        function clearCache(section = null) {
+            if (section) {
+                dataCache[section] = null;
+                delete dataCache.lastUpdated[section];
+            } else {
+                // Clear all caches
+                dataCache.bio = null;
+                dataCache.documents = null;
+                dataCache.links = null;
+                dataCache.notes = null;
+                dataCache.todos = null;
+                dataCache.lastUpdated = {};
+            }
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Get current user ID
+                currentUserId = authHelper.getCurrentUserId();
+                if (!currentUserId) {
+                    currentUserId = 'user_' + Date.now();
+                    authHelper.setCurrentUserId(currentUserId);
+                }
+
+                // Load persisted data for this user (if any)
+                try { loadMockData(currentUserId); } catch (e) { console.warn('No persisted data to load for user', currentUserId); }
+                
+                // Initialize auto-save managers for all sections that need it
+                notesAutoSaveManager = new AutoSaveManager(saveNotes, 1000);
+                
+                // Add auto-save managers for other sections if needed
+                bioAutoSaveManager = new AutoSaveManager(saveBioFields, 1500);
+                
+                // Initialize the app
+                await initializeApp();
+            } catch (error) {
+                ErrorHandler.handle(error, 'app initialization');
+            }
+        });
+
+        async function initializeApp() {
+            LoadingManager.showLoading(true);
+            try {
+                // Load settings first
+                await loadSettings();
+                
+                // Load all data sections with individual error handling
+                await Promise.all([
+                    loadBioData(),
+                    loadDocuments(),
+                    loadLinks(),
+                    loadNotes(),
+                    loadTodos()
+                ]);
+                
+                setupEventListeners();
+                initializeTabNavigation();
+                ErrorHandler.showNotification('Dashboard loaded successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'app initialization');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        function setupEventListeners() {
+            // File upload
+            const fileInput = document.getElementById('fileInput');
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            
+            fileInput.addEventListener('change', handleFileUpload);
+            
+            // Drag and drop functionality
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('active');
+            });
+            
+            fileUploadArea.addEventListener('dragleave', () => {
+                fileUploadArea.classList.remove('active');
+            });
+            
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('active');
+                
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileUpload({ target: fileInput });
+                }
+            });
+            
+            // Click to upload
+            fileUploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Notes auto-save
+            document.getElementById('notesTextarea').addEventListener('input', function(e) {
+                // Limit to 10,000 characters to handle large text efficiently
+                if (e.target.value.length > 10000) {
+                    e.target.value = e.target.value.substring(0, 10000);
+                    ErrorHandler.showNotification('Note limit reached (10,000 characters)', 'info');
+                }
+                
+                notesAutoSaveManager.trigger();
+                updateNotesCharCount();
+            });
+            
+            // Clear notes button
+            document.getElementById('clearNotesBtn').addEventListener('click', clearNotes);
+            
+            // Todo input
+            document.getElementById('todoInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTodo();
+                }
+            });
+            
+            // Add animation to the todo input focus
+            document.getElementById('todoInput').addEventListener('focus', function() {
+                this.style.transform = 'scale(1.02)';
+                this.style.boxShadow = '0 0 2px rgba(100, 181, 246, 0.4)';
+            });
+            
+            document.getElementById('todoInput').addEventListener('blur', function() {
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
+        }
+
+        function initializeTabNavigation() {
+            // Add click event listeners to tab buttons
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+            
+            // Set first tab as active by default
+            if (tabButtons.length > 0) {
+                switchTab(tabButtons[0].getAttribute('data-tab'));
+            }
+        }
+
+        function switchTab(tabId) {
+            // Update active tab button
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+                if (button.getAttribute('data-tab') === tabId) {
+                    button.classList.add('active');
+                }
+            });
+            
+            // Show selected tab content and hide others
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `${tabId}-tab`) {
+                    content.classList.add('active');
+                }
+            });
+        }
+
+        // Bio Section Functions
+        async function loadBioData() {
+            try {
+                LoadingManager.showLoading(true);
+                
+                // Check if we have cached data that is still fresh
+                const now = Date.now();
+                if (dataCache.bio &&
+                    dataCache.lastUpdated.bio &&
+                    (now - dataCache.lastUpdated.bio) < CACHE_TIMEOUT) {
+                    // Use cached data
+                    renderBioTable(dataCache.bio.fields || {});
+                    ErrorHandler.showNotification('Bio data loaded from cache', 'info');
+                } else {
+                    // Fetch fresh data
+                    const bioData = await bioService.getBio(currentUserId);
+                    
+                    // Validate the retrieved data
+                    if (!bioData || typeof bioData !== 'object') {
+                        throw new Error('Invalid bio data received from server');
+                    }
+                    
+                    // Cache the data
+                    dataCache.bio = bioData;
+                    dataCache.lastUpdated.bio = now;
+                    
+                    renderBioTable(bioData.fields || {});
+                    ErrorHandler.showNotification('Bio data loaded successfully', 'success');
+                }
+            } catch (error) {
+                ErrorHandler.handle(error, 'loading bio data');
+                // Render empty table in case of error
+                renderBioTable({});
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        function renderBioTable(fields) {
+            const tbody = document.getElementById('bioTableBody');
+            tbody.innerHTML = '';
+            
+            Object.entries(fields).forEach(([key, value]) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="bio-field-name">${key}</td>
+                    <td class="bio-field-value" data-field="${key}" data-value="${value}" onclick="editBioField(this)">${value || ''}</td>
+                    <td>
+                        <button class="delete-field-btn" onclick="deleteBioField('${key}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function addBioField() {
+            const fieldName = prompt('Enter field name:');
+            if (!fieldName || fieldName.trim() === '') return;
+            
+            try {
+                LoadingManager.showLoading(true);
+                await bioService.addBioField(currentUserId, fieldName.trim());
+                clearCache('bio'); // Clear bio cache after update
+                await loadBioData(); // Reload to reflect changes
+                ErrorHandler.showNotification('Field added successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'adding bio field');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        async function updateBioField(fieldName, value) {
+            try {
+                // Update the bio data in the database
+                const bioData = await bioService.getBio(currentUserId);
+                bioData.fields[fieldName] = value;
+                await bioService.updateBio(currentUserId, bioData.fields);
+                
+                // Update the UI to reflect the change
+                const fieldElements = document.querySelectorAll(`.bio-field-value[data-field="${fieldName}"]`);
+                fieldElements.forEach(element => {
+                    element.textContent = value;
+                    element.setAttribute('data-value', value);
+                });
+                
+                clearCache('bio'); // Clear bio cache after update
+                
+                // Show success notification without loading indicator
+                ErrorHandler.showNotification('Bio field updated successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'updating bio field');
+            }
+        }
+
+        // Function to save all bio fields (for auto-save)
+        async function saveBioFields() {
+            try {
+                // Get current bio data
+                const bioData = await bioService.getBio(currentUserId);
+                
+                // Get all current bio field values from the UI
+                const bioTable = document.getElementById('bioTableBody');
+                const rows = bioTable.querySelectorAll('tr');
+                
+                const updatedFields = {};
+                rows.forEach(row => {
+                    const fieldName = row.querySelector('.bio-field-name').textContent;
+                    const fieldValue = row.querySelector('.bio-field-value').textContent || '';
+                    updatedFields[fieldName] = fieldValue;
+                });
+                
+                // Update the bio in the database
+                await bioService.updateBio(currentUserId, updatedFields);
+                
+                ErrorHandler.showNotification('Bio fields saved successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'saving bio fields');
+            }
+        }
+
+        async function editBioField(element) {
+            const fieldName = element.getAttribute('data-field');
+            const currentValue = element.getAttribute('data-value');
+            
+            // Create input field
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'bio-field-input';
+            input.value = currentValue;
+            
+            // Replace content with input
+            element.innerHTML = '';
+            element.appendChild(input);
+            input.focus();
+            
+            // Select all text for easy editing
+            input.select();
+            
+            // Handle save on blur or enter key
+            const saveValue = async () => {
+                const newValue = input.value;
+                element.textContent = newValue;
+                element.setAttribute('data-value', newValue);
+                await updateBioField(fieldName, newValue);
+                
+                // Trigger auto-save for bio fields
+                if (typeof bioAutoSaveManager !== 'undefined') {
+                    bioAutoSaveManager.trigger();
+                }
+            };
+            
+            input.addEventListener('blur', saveValue);
+            
+            input.addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    await saveValue();
+                } else if (e.key === 'Escape') {
+                    // Revert to original value on escape
+                    element.textContent = currentValue;
+                    element.setAttribute('data-value', currentValue);
+                }
+            });
+        }
+
+        async function deleteBioField(fieldName) {
+            if (!confirm(`Delete field "${fieldName}"?`)) return;
+            
+            try {
+                LoadingManager.showLoading(true);
+                await bioService.deleteBioField(currentUserId, fieldName);
+                clearCache('bio'); // Clear bio cache after update
+                await loadBioData(); // Reload to reflect changes
+                ErrorHandler.showNotification('Field deleted successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'deleting bio field');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        // Documents Section Functions
+        async function handleFileUpload(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+            
+            const uploadStatus = document.getElementById('uploadStatus');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadProgressBar = document.getElementById('uploadProgressBar');
+            
+            // Reset UI
+            uploadStatus.textContent = '';
+            uploadStatus.className = 'upload-status';
+            uploadProgress.style.display = 'block';
+            uploadProgressBar.style.width = '0%';
+            
+            try {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    
+                    // Update progress
+                    const progress = ((i + 1) / files.length) * 100;
+                    uploadProgressBar.style.width = `${progress}%`;
+                    uploadStatus.textContent = `Uploading ${file.name}...`;
+                    uploadStatus.className = 'upload-status';
+                    
+                    try {
+                        await documentService.uploadDocument(currentUserId, file);
+                    } catch (error) {
+                        // Show error for this specific file but continue with others
+                        ErrorHandler.showNotification(`Failed to upload ${file.name}: ${error.message}`, 'error');
+                        console.error(`Error uploading ${file.name}:`, error);
+                    }
+                }
+                
+                // Update status to success
+                uploadStatus.textContent = `${files.length} file(s) uploaded successfully!`;
+                uploadStatus.className = 'upload-status success';
+                
+                // Refresh documents after a short delay
+                setTimeout(async () => {
+                    await loadDocuments();
+                    uploadProgress.style.display = 'none';
+                    uploadStatus.textContent = '';
+                    uploadStatus.className = 'upload-status';
+                    uploadProgressBar.style.width = '0%';
+                }, 100);
+            } catch (error) {
+                uploadStatus.textContent = `Upload failed: ${error.message}`;
+                uploadStatus.className = 'upload-status error';
+                ErrorHandler.handle(error, 'uploading files');
+            }
+            
+            // Reset file input after a delay to allow for visual feedback
+            setTimeout(() => {
+                event.target.value = '';
+            }, 1500);
+        }
+
+
+        async function loadDocuments() {
+            try {
+                // Check if we have cached data that is still fresh
+                const now = Date.now();
+                if (dataCache.documents &&
+                    dataCache.lastUpdated.documents &&
+                    (now - dataCache.lastUpdated.documents) < CACHE_TIMEOUT) {
+                    // Use cached data
+                    renderDocuments(dataCache.documents);
+                    ErrorHandler.showNotification('Documents loaded from cache', 'info');
+                } else {
+                    // Fetch fresh data
+                    const documents = await documentService.getUserDocuments(currentUserId);
+                    
+                    // Validate the retrieved data
+                    if (!Array.isArray(documents)) {
+                        throw new Error('Invalid documents data received from server');
+                    }
+                    
+                    // Cache the data
+                    dataCache.documents = documents;
+                    dataCache.lastUpdated.documents = now;
+                    
+                    renderDocuments(documents);
+                    ErrorHandler.showNotification('Documents loaded successfully', 'success');
+                }
+            } catch (error) {
+                ErrorHandler.handle(error, 'loading documents');
+                // Render empty documents in case of error
+                renderDocuments([]);
+            }
+        }
+
+        function renderDocuments(documents) {
+            const grid = document.getElementById('documentsGrid');
+            grid.innerHTML = '';
+            
+            if (documents.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-documents">
+                        <i class="fas fa-cloud"></i>
+                        <h3>No Documents Uploaded</h3>
+                        <p>Upload your files using the area above</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            documents.forEach(doc => {
+                const item = document.createElement('div');
+                item.className = 'document-item';
+
+                const icon = getFileIcon(doc.type, doc.name);
+                const date = new Date(doc.uploadDate).toLocaleDateString();
+                const size = formatFileSize(doc.size);
+
+                const header = document.createElement('div');
+                header.className = 'document-header';
+
+                const iconWrap = document.createElement('div');
+                iconWrap.className = 'document-icon';
+                iconWrap.innerHTML = icon;
+
+                const info = document.createElement('div');
+                info.className = 'document-info';
+                const nameEl = document.createElement('div');
+                nameEl.className = 'document-name';
+                nameEl.title = doc.name;
+                nameEl.textContent = truncateFileName(doc.name, 30);
+                const sizeEl = document.createElement('div');
+                sizeEl.className = 'document-size';
+                sizeEl.textContent = size;
+                const dateEl = document.createElement('div');
+                dateEl.className = 'document-date';
+                dateEl.textContent = `Uploaded: ${date}`;
+
+                info.appendChild(nameEl);
+                info.appendChild(sizeEl);
+                info.appendChild(dateEl);
+
+                header.appendChild(iconWrap);
+                header.appendChild(info);
+
+                const actions = document.createElement('div');
+                actions.className = 'document-actions';
+
+                const openBtn = document.createElement('button');
+                openBtn.className = 'action-btn';
+                openBtn.title = 'Open in new tab';
+                openBtn.innerHTML = '<i class="fas fa-external-link-alt"></i> Open';
+                openBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openDocument(doc.url);
+                });
+
+                const dlBtn = document.createElement('button');
+                dlBtn.className = 'action-btn';
+                dlBtn.title = 'Download file';
+                dlBtn.innerHTML = '<i class="fas fa-download"></i> Download';
+                dlBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    downloadDocument(doc.url, doc.name);
+                });
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'action-btn delete';
+                delBtn.title = 'Delete file';
+                delBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteDocument(doc.id, doc.storagePath);
+                });
+
+                actions.appendChild(openBtn);
+                actions.appendChild(dlBtn);
+                actions.appendChild(delBtn);
+
+                item.appendChild(header);
+                item.appendChild(actions);
+
+                grid.appendChild(item);
+            });
+        }
+
+        function getFileIcon(type, name) {
+            const ext = name.split('.').pop().toLowerCase();
+            
+            // Image files
+            if (type.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(ext)) {
+                return '<i class="fas fa-file-image"></i>';
+            }
+            // PDF files
+            if (ext === 'pdf') return '<i class="fas fa-file-pdf"></i>';
+            // Word documents
+            if (['doc', 'docx'].includes(ext)) return '<i class="fas fa-file-word"></i>';
+            // Excel spreadsheets
+            if (['xls', 'xlsx', 'csv'].includes(ext)) return '<i class="fas fa-file-excel"></i>';
+            // PowerPoint presentations
+            if (['ppt', 'pptx'].includes(ext)) return '<i class="fas fa-file-powerpoint"></i>';
+            // Text files
+            if (['txt', 'md', 'rtf'].includes(ext)) return '<i class="fas fa-file-alt"></i>';
+            // Archive files
+            if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return '<i class="fas fa-file-archive"></i>';
+            // Code files
+            if (['js', 'ts', 'py', 'java', 'cpp', 'c', 'html', 'css', 'json', 'xml'].includes(ext)) {
+                return '<i class="fas fa-file-code"></i>';
+            }
+            // Audio files
+            if (type.startsWith('audio/') || ['mp3', 'wav', 'ogg', 'flac'].includes(ext)) {
+                return '<i class="fas fa-file-audio"></i>';
+            }
+            // Video files
+            if (type.startsWith('video/') || ['mp4', 'avi', 'mov', 'mkv', 'wmv'].includes(ext)) {
+                return '<i class="fas fa-file-video"></i>';
+            }
+            
+            // Default file icon
+            return '<i class="fas fa-file"></i>';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function truncateFileName(name, maxLength) {
+            if (name.length <= maxLength) return name;
+            return name.substring(0, maxLength) + '...';
+        }
+
+        function openDocument(url) {
+            if (url.startsWith('data:')) {
+                // Handle data URLs by converting to blob for better browser support
+                try {
+                    const arr = url.split(',');
+                    const mime = arr[0].match(/:(.*?);/)[1];
+                    const bstr = atob(arr[1]);
+                    let n = bstr.length;
+                    const u8arr = new Uint8Array(n);
+                    while (n--) {
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    const blob = new Blob([u8arr], { type: mime });
+                    const blobUrl = URL.createObjectURL(blob);
+                    window.open(blobUrl, '_blank');
+                    // Don't revoke for opening, as the new tab needs the URL
+                } catch (error) {
+                    console.error('Error opening data URL:', error);
+                    // Fallback to direct data URL
+                    window.open(url, '_blank');
+                }
+            } else {
+                // Regular URL
+                window.open(url, '_blank');
+            }
+        }
+
+        function downloadDocument(url, filename) {
+            if (url.startsWith('data:')) {
+                // Handle data URLs by converting to blob
+                try {
+                    const arr = url.split(',');
+                    const mime = arr[0].match(/:(.*?);/)[1];
+                    const bstr = atob(arr[1]);
+                    let n = bstr.length;
+                    const u8arr = new Uint8Array(n);
+                    while (n--) {
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    const blob = new Blob([u8arr], { type: mime });
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = filename;
+                    a.click();
+                    URL.revokeObjectURL(blobUrl);
+                } catch (error) {
+                    console.error('Error downloading data URL:', error);
+                    // Fallback to direct data URL
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+                }
+            } else {
+                // Regular URL
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+            }
+        }
+
+        async function deleteDocument(docId, storagePath) {
+            if (!confirm('Delete this document?')) return;
+            
+            try {
+                LoadingManager.showLoading(true);
+                await documentService.deleteDocument(currentUserId, docId, storagePath);
+                clearCache('documents'); // Clear documents cache after deletion
+                await loadDocuments(); // Reload to reflect changes
+                ErrorHandler.showNotification('Document deleted successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'deleting document');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        // Links Section Functions
+        function showAddLinkModal() {
+            document.getElementById('addLinkModal').style.display = 'block';
+            document.getElementById('linkName').focus();
+        }
+
+        function closeAddLinkModal() {
+            document.getElementById('addLinkModal').style.display = 'none';
+            document.getElementById('linkName').value = '';
+            document.getElementById('linkUrl').value = '';
+            document.getElementById('linkDescription').value = '';
+        }
+
+        async function saveLinkFromModal() {
+            const name = document.getElementById('linkName').value.trim();
+            let url = document.getElementById('linkUrl').value.trim();
+            const description = document.getElementById('linkDescription').value.trim();
+            
+            // Validation
+            if (!name) {
+                ErrorHandler.showNotification('Please enter a name for the link', 'error');
+                return;
+            }
+            
+            if (!url) {
+                ErrorHandler.showNotification('Please enter a URL', 'error');
+                return;
+            }
+            
+            // Add https:// if no protocol is specified
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+            
+            // Basic URL validation
+            try {
+                new URL(url);
+            } catch (e) {
+                ErrorHandler.showNotification('Please enter a valid URL (e.g., https://example.com)', 'error');
+                return;
+            }
+            
+            try {
+                LoadingManager.showLoading(true);
+                await linkService.addLink(currentUserId, { name, url, description });
+                clearCache('links'); // Clear links cache after adding
+                closeAddLinkModal();
+                await loadLinks(); // Reload to reflect changes
+                ErrorHandler.showNotification('Link added successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'saving link');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        async function loadLinks() {
+            try {
+                LoadingManager.showLoading(true);
+                
+                // Check if we have cached data that is still fresh
+                const now = Date.now();
+                if (dataCache.links &&
+                    dataCache.lastUpdated.links &&
+                    (now - dataCache.lastUpdated.links) < CACHE_TIMEOUT) {
+                    // Use cached data
+                    renderLinks(dataCache.links);
+                    ErrorHandler.showNotification('Links loaded from cache', 'info');
+                } else {
+                    // Fetch fresh data
+                    const links = await linkService.getUserLinks(currentUserId);
+                    
+                    // Validate the retrieved data
+                    if (!Array.isArray(links)) {
+                        throw new Error('Invalid links data received from server');
+                    }
+                    
+                    // Cache the data
+                    dataCache.links = links;
+                    dataCache.lastUpdated.links = now;
+                    
+                    renderLinks(links);
+                    ErrorHandler.showNotification('Links loaded successfully', 'success');
+                }
+            } catch (error) {
+                ErrorHandler.handle(error, 'loading links');
+                // Render empty links in case of error
+                renderLinks([]);
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        function renderLinks(links) {
+            const grid = document.getElementById('linksGrid');
+            grid.innerHTML = '';
+            
+            if (links.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-links">
+                        <i class="fas fa-link"></i>
+                        <h3>No Links Added</h3>
+                        <p>Add your first link using the button above</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            links.forEach(link => {
+                const item = document.createElement('div');
+                item.className = 'link-item';
+                item.style.cursor = 'pointer';
+                
+                item.innerHTML = `
+                    <div class="link-content">
+                        <div class="link-header">
+                            <div class="link-name">${link.name}</div>
+                        </div>
+                        <div class="link-url">
+                            <i class="fas fa-external-link-alt"></i>
+                            <a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.url}</a>
+                        </div>
+                        ${link.description ? `<div class="link-description">${link.description}</div>` : ''}
+                    </div>
+                    <div class="link-actions">
+                        <button class="link-delete" onclick="event.stopPropagation(); deleteLink('${link.id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                
+                // Make entire card clickable to open link in new tab
+                item.addEventListener('click', function(e) {
+                    // Don't open if clicking on delete button or the link itself
+                    if (!e.target.closest('.link-delete') && !e.target.closest('a')) {
+                        window.open(link.url, '_blank');
+                    }
+                });
+                
+                grid.appendChild(item);
+            });
+        }
+
+        async function deleteLink(linkId) {
+            if (!confirm('Delete this link?')) return;
+            
+            try {
+                LoadingManager.showLoading(true);
+                await linkService.deleteLink(currentUserId, linkId);
+                clearCache('links'); // Clear links cache after deletion
+                await loadLinks(); // Reload to reflect changes
+                ErrorHandler.showNotification('Link deleted successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'deleting link');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        // Notes Section Functions
+        async function saveNotes() {
+            const notes = document.getElementById('notesTextarea').value;
+            
+            try {
+                // Update status to saving
+                updateNotesStatus('saving');
+                
+                await noteService.saveNotes(currentUserId, notes);
+                clearCache('notes'); // Clear notes cache after saving
+                
+                // Update status to saved with timestamp
+                updateNotesStatus('saved');
+            } catch (error) {
+                // Update status to error
+                updateNotesStatus('error');
+                ErrorHandler.handle(error, 'saving notes');
+            }
+        }
+
+        async function loadNotes() {
+            try {
+                // Check if we have cached data that is still fresh
+                const now = Date.now();
+                if (dataCache.notes &&
+                    dataCache.lastUpdated.notes &&
+                    (now - dataCache.lastUpdated.notes) < CACHE_TIMEOUT) {
+                    // Use cached data
+                    const notesData = dataCache.notes;
+                    document.getElementById('notesTextarea').value = notesData.content || '';
+                    
+                    // Update character count
+                    updateNotesCharCount();
+                    
+                    // Update last saved timestamp if available
+                    if (notesData.lastUpdated) {
+                        updateNotesLastSaved(notesData.lastUpdated);
+                    }
+                    
+                    ErrorHandler.showNotification('Notes loaded from cache', 'info');
+                } else {
+                    // Fetch fresh data
+                    const notesData = await noteService.getNotes(currentUserId);
+                    
+                    // Validate the retrieved data
+                    if (!notesData || typeof notesData !== 'object') {
+                        throw new Error('Invalid notes data received from server');
+                    }
+                    
+                    // Cache the data
+                    dataCache.notes = notesData;
+                    dataCache.lastUpdated.notes = now;
+                    
+                    document.getElementById('notesTextarea').value = notesData.content || '';
+                    
+                    // Update character count
+                    updateNotesCharCount();
+                    
+                    // Update last saved timestamp if available
+                    if (notesData.lastUpdated) {
+                        updateNotesLastSaved(notesData.lastUpdated);
+                    }
+                    
+                    ErrorHandler.showNotification('Notes loaded successfully', 'success');
+                }
+            } catch (error) {
+                ErrorHandler.handle(error, 'loading notes');
+                // Clear notes in case of error
+                document.getElementById('notesTextarea').value = '';
+                updateNotesCharCount();
+            }
+        }
+
+        // Update notes status display
+        function updateNotesStatus(status) {
+            const statusElement = document.getElementById('notesSaveStatus');
+            const statusClasses = ['saving', 'saved', 'error', 'ready'];
+            
+            // Remove all status classes
+            statusClasses.forEach(cls => statusElement.classList.remove(cls));
+            
+            // Add current status class
+            if (status !== 'ready') {
+                statusElement.classList.add(status);
+            }
+            
+            // Set status text
+            switch (status) {
+                case 'saving':
+                    statusElement.textContent = 'Saving...';
+                    break;
+                case 'saved':
+                    statusElement.textContent = 'Saved';
+                    break;
+                case 'error':
+                    statusElement.textContent = 'Save Error';
+                    break;
+                case 'ready':
+                    statusElement.textContent = 'Ready';
+                    break;
+            }
+            
+            notesSaveStatus = status;
+        }
+
+        // Update character count display
+        function updateNotesCharCount() {
+            const textarea = document.getElementById('notesTextarea');
+            const charCountElement = document.getElementById('notesCharCount');
+            const charCount = textarea.value.length;
+            
+            // Format number with commas
+            const formattedCount = charCount.toLocaleString();
+            
+            charCountElement.textContent = `${formattedCount} characters`;
+            
+            // Add warning class if approaching limit
+            if (charCount > 9000) { // 90% of 10,000 character limit
+                charCountElement.classList.add('warning');
+            } else {
+                charCountElement.classList.remove('warning');
+            }
+        }
+
+        // Update last saved timestamp
+        function updateNotesLastSaved(timestamp) {
+            const lastSavedElement = document.getElementById('notesLastSaved');
+            if (timestamp) {
+                const date = new Date(timestamp);
+                const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const formattedDate = date.toLocaleDateString();
+                lastSavedElement.textContent = `Last saved: ${formattedDate} at ${formattedTime}`;
+            }
+        }
+
+        // Clear notes function
+        function clearNotes() {
+            if (confirm('Are you sure you want to clear all notes? This cannot be undone.')) {
+                document.getElementById('notesTextarea').value = '';
+                updateNotesCharCount();
+                
+                // Trigger auto-save to clear the notes in the database
+                notesAutoSaveManager.trigger();
+            }
+        }
+
+
+        // Todo Section Functions
+        async function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            
+            if (!text) {
+                ErrorHandler.showNotification('Please enter a task', 'error');
+                return;
+            }
+            
+            try {
+                LoadingManager.showLoading(true);
+                await todoService.addTodo(currentUserId, text);
+                clearCache('todos'); // Clear todos cache after adding
+                input.value = '';
+                
+                // Instead of reloading all todos, just add the new one to the list
+                // This will be more efficient and allow for better animations
+                await loadTodos(); // Reload to reflect changes
+                
+                // Add ripple effect to the input field
+                const ripple = document.createElement('div');
+                ripple.className = 'ripple';
+                
+                // Position ripple relative to input container
+                const inputContainer = document.querySelector('.todo-input-container');
+                const inputRect = input.getBoundingClientRect();
+                const containerRect = inputContainer.getBoundingClientRect();
+                
+                // Calculate relative position
+                ripple.style.position = 'absolute';
+                ripple.style.left = (inputRect.left - containerRect.left + inputRect.width/2) + 'px';
+                ripple.style.top = (inputRect.top - containerRect.top + inputRect.height/2) + 'px';
+                ripple.style.transform = 'translate(-50%, -50%) scale(0)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.backgroundColor = 'rgba(100, 181, 246, 0.3)';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.zIndex = '1';
+                ripple.style.transition = 'transform 0.6s ease, opacity 0.6s ease';
+                
+                inputContainer.appendChild(ripple);
+                
+                // Trigger ripple animation
+                setTimeout(() => {
+                    ripple.classList.add('active');
+                }, 10);
+                
+                // Remove ripple after animation
+                setTimeout(() => {
+                    if (ripple.parentNode) {
+                        ripple.parentNode.removeChild(ripple);
+                    }
+                }, 600);
+                
+                ErrorHandler.showNotification('Task added successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'adding todo');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        async function loadTodos() {
+            try {
+                LoadingManager.showLoading(true);
+                
+                // Check if we have cached data that is still fresh
+                const now = Date.now();
+                if (dataCache.todos &&
+                    dataCache.lastUpdated.todos &&
+                    (now - dataCache.lastUpdated.todos) < CACHE_TIMEOUT) {
+                    // Use cached data
+                    renderTodos(dataCache.todos);
+                    updateTodoStats(dataCache.todos);
+                    ErrorHandler.showNotification('Tasks loaded from cache', 'info');
+                } else {
+                    // Fetch fresh data
+                    const todos = await todoService.getUserTodos(currentUserId);
+                    
+                    // Validate the retrieved data
+                    if (!Array.isArray(todos)) {
+                        throw new Error('Invalid todos data received from server');
+                    }
+                    
+                    // Cache the data
+                    dataCache.todos = todos;
+                    dataCache.lastUpdated.todos = now;
+                    
+                    renderTodos(todos);
+                    updateTodoStats(todos);
+                    ErrorHandler.showNotification('Tasks loaded successfully', 'success');
+                }
+            } catch (error) {
+                ErrorHandler.handle(error, 'loading todos');
+                // Render empty todos in case of error
+                renderTodos([]);
+                updateTodoStats([]);
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        function renderTodos(todos) {
+            const list = document.getElementById('todoList');
+            list.innerHTML = '';
+            
+            if (todos.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-todo">
+                        <i class="fas fa-tasks"></i>
+                        <h3>No Tasks Yet</h3>
+                        <p>Add your first task using the input above</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            todos.forEach(todo => {
+                const item = document.createElement('div');
+                item.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                item.dataset.id = todo.id;
+                
+                item.innerHTML = `
+                    <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''}
+                           onchange="toggleTodo('${todo.id}', this.checked)">
+                    <span class="todo-text" onclick="editTodoText('${todo.id}', this)" style="${todo.completed ? 'text-decoration:line-through;opacity:0.7;' : ''}">${todo.text}</span>
+                    <div class="todo-actions">
+                        <button class="todo-delete" title="Delete task" onclick="deleteTodo('${todo.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                // Add animation when adding
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(-10px)';
+                list.appendChild(item);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, 10);
+            });
+        }
+
+        // Update todo statistics
+        function updateTodoStats(todos) {
+            const total = todos.length;
+            const completed = todos.filter(todo => todo.completed).length;
+            const pending = total - completed;
+            
+            const statsElement = document.getElementById('todoStats');
+            statsElement.innerHTML = `
+                <span>${total} total | ${completed} completed | ${pending} pending</span>
+                <div class="progress-bar">
+                    <span class="progress-fill" style="width: ${total > 0 ? (completed / total) * 100 : 0}%"></span>
+                </div>
+            `;
+        }
+
+        async function toggleTodo(todoId, completed) {
+            try {
+                LoadingManager.showLoading(true);
+                await todoService.updateTodo(todoId, completed);
+                clearCache('todos'); // Clear todos cache after update
+                
+                // Find the todo item and add animation
+                const todoItem = document.querySelector('.todo-item[data-id="' + todoId + '"]');
+                if (todoItem) {
+                    todoItem.classList.toggle('completed', completed);
+                    
+                    // Add visual feedback animation
+                    todoItem.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        todoItem.style.transform = '';
+                    }, 150);
+                    
+                    // Add ripple effect for visual feedback
+                    const ripple = document.createElement('div');
+                    ripple.className = 'ripple';
+                    const rect = todoItem.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = size + 'px';
+                    ripple.style.height = size + 'px';
+                    ripple.style.top = '50%';
+                    ripple.style.left = '50%';
+                    
+                    todoItem.appendChild(ripple);
+                    
+                    // Trigger ripple animation
+                    setTimeout(() => {
+                        ripple.classList.add('active');
+                    }, 10);
+                    
+                    // Remove ripple after animation
+                    setTimeout(() => {
+                        if (ripple.parentNode) {
+                            ripple.parentNode.removeChild(ripple);
+                        }
+                    }, 600);
+                    // Update todo text style for strikethrough immediately
+                    const textEl = todoItem.querySelector('.todo-text');
+                    if (textEl) {
+                        if (completed) {
+                            textEl.style.textDecoration = 'line-through';
+                            textEl.style.opacity = '0.7';
+                        } else {
+                            textEl.style.textDecoration = '';
+                            textEl.style.opacity = '1';
+                        }
+                    }
+                }
+                
+                // Update stats
+                const todos = await todoService.getUserTodos(currentUserId);
+                updateTodoStats(todos);
+                
+                ErrorHandler.showNotification('Task ' + (completed ? 'completed' : 'marked as pending'), 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'toggling todo');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        async function deleteTodo(todoId) {
+            if (!confirm('Are you sure you want to delete this task?')) return;
+            
+            try {
+                LoadingManager.showLoading(true);
+                
+                // Add animation before deletion
+                const todoItem = document.querySelector(`.todo-item[data-id="${todoId}"]`);
+                if (todoItem) {
+                    // Add ripple effect for deletion
+                    const ripple = document.createElement('div');
+                    ripple.className = 'ripple';
+                    const rect = todoItem.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = size + 'px';
+                    ripple.style.height = size + 'px';
+                    ripple.style.top = '50%';
+                    ripple.style.left = '50%';
+                    ripple.style.backgroundColor = 'rgba(255, 71, 87, 0.3)';
+                    
+                    todoItem.appendChild(ripple);
+                    
+                    // Trigger ripple animation
+                    setTimeout(() => {
+                        ripple.classList.add('active');
+                    }, 10);
+                    
+                    // Add removing class for slide out animation
+                    todoItem.classList.add('removing');
+                    
+                    // Wait for animation to complete before removing
+                    setTimeout(async () => {
+                        await todoService.deleteTodo(currentUserId, todoId);
+                        clearCache('todos'); // Clear todos cache after deletion
+                        await loadTodos(); // Reload to reflect changes
+                        ErrorHandler.showNotification('Task deleted successfully', 'success');
+                    }, 300);
+                } else {
+                    // If animation element not found, just delete directly
+                    await todoService.deleteTodo(currentUserId, todoId);
+                    clearCache('todos'); // Clear todos cache after deletion
+                    await loadTodos(); // Reload to reflect changes
+                    ErrorHandler.showNotification('Task deleted successfully', 'success');
+                }
+            } catch (error) {
+                ErrorHandler.handle(error, 'deleting todo');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        // Function to edit todo text with better UI
+        async function editTodoText(todoId, element) {
+            const currentText = element.textContent;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentText;
+            input.className = 'todo-edit-input';
+            input.style.width = '100%';
+            input.style.padding = '8px';
+            input.style.border = '1px solid #64b5f6';
+            input.style.borderRadius = '4px';
+            input.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            input.style.color = '#e0e6ed';
+            input.style.fontSize = '1rem';
+            input.style.outline = 'none';
+            
+            // Replace text with input
+            const originalContent = element.innerHTML;
+            element.innerHTML = '';
+            element.appendChild(input);
+            input.focus();
+            input.select();
+            
+            // Handle save on blur or enter key
+            const saveEdit = async () => {
+                const newText = input.value.trim();
+                if (newText !== '' && newText !== currentText) {
+                    try {
+                        LoadingManager.showLoading(true);
+                        
+                        // Update the todo text in Firebase
+                        await todoService.updateTodoText(todoId, newText);
+                        clearCache('todos'); // Clear todos cache after update
+                        
+                        // Update the UI directly without reloading
+                        element.textContent = newText;
+                        
+                        ErrorHandler.showNotification('Task updated successfully', 'success');
+                    } catch (error) {
+                        ErrorHandler.handle(error, 'editing todo');
+                        // Revert to original text on error
+                        element.textContent = currentText;
+                    } finally {
+                        LoadingManager.showLoading(false);
+                    }
+                } else {
+                    // Revert to original text if empty or unchanged
+                    element.textContent = currentText;
+                }
+            };
+            
+            input.addEventListener('blur', saveEdit);
+            
+            input.addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    await saveEdit();
+                } else if (e.key === 'Escape') {
+                    // Revert to original text on escape
+                    element.textContent = currentText;
+                }
+            });
+        }
+
+        // Make functions globally available
+        window.addBioField = addBioField;
+        window.updateBioField = updateBioField;
+        window.deleteBioField = deleteBioField;
+        window.editBioField = editBioField;
+        window.openDocument = openDocument;
+        window.downloadDocument = downloadDocument;
+        window.deleteDocument = deleteDocument;
+        window.showAddLinkModal = showAddLinkModal;
+        window.closeAddLinkModal = closeAddLinkModal;
+        window.saveLinkFromModal = saveLinkFromModal;
+        window.deleteLink = deleteLink;
+        window.addTodo = addTodo;
+        window.toggleTodo = toggleTodo;
+        window.deleteTodo = deleteTodo;
+        window.editTodoText = editTodoText;
+
+        // Settings Functions
+        async function loadSettings() {
+            try {
+                const userProfile = getUserProfile();
+                
+                // Load dashboard name
+                const dashboardTitle = document.getElementById('dashboardTitle');
+                const dashboardNameInput = document.getElementById('dashboardName');
+                if (userProfile.dashboardName) {
+                    dashboardTitle.textContent = userProfile.dashboardName;
+                    dashboardNameInput.value = userProfile.dashboardName;
+                } else {
+                    dashboardNameInput.value = 'Personal Dashboard - Mock Test';
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        function getUserProfile() {
+            const PROFILE_KEY = 'userProfiles_v1';
+            try {
+                const profiles = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+                const userEmail = currentUserId || 'default';
+                if (!profiles[userEmail]) {
+                    profiles[userEmail] = {
+                        email: userEmail,
+                        password: 'admin',
+                        dashboardName: 'Personal Dashboard - Mock Test'
+                    };
+                    localStorage.setItem(PROFILE_KEY, JSON.stringify(profiles));
+                }
+                return profiles[userEmail];
+            } catch (error) {
+                console.error('Error getting user profile:', error);
+                return { email: currentUserId, password: 'admin', dashboardName: 'Personal Dashboard - Mock Test' };
+            }
+        }
+
+        function updateUserProfile(updates) {
+            const PROFILE_KEY = 'userProfiles_v1';
+            try {
+                const profiles = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+                const userEmail = currentUserId || 'default';
+                profiles[userEmail] = { ...profiles[userEmail], ...updates };
+                localStorage.setItem(PROFILE_KEY, JSON.stringify(profiles));
+                return true;
+            } catch (error) {
+                console.error('Error updating user profile:', error);
+                return false;
+            }
+        }
+
+        async function saveDashboardName() {
+            const nameInput = document.getElementById('dashboardName');
+            const newName = nameInput.value.trim();
+            
+            if (!newName) {
+                ErrorHandler.showNotification('Please enter a dashboard name', 'error');
+                return;
+            }
+            
+            try {
+                LoadingManager.showLoading(true);
+                
+                // Update profile
+                updateUserProfile({ dashboardName: newName });
+                
+                // Update header
+                document.getElementById('dashboardTitle').textContent = newName;
+                
+                ErrorHandler.showNotification('Dashboard name updated successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'saving dashboard name');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        async function changePassword() {
+            const currentPwd = document.getElementById('currentPassword').value;
+            const newPwd = document.getElementById('newPassword').value;
+            const confirmPwd = document.getElementById('confirmPassword').value;
+            
+            if (!currentPwd || !newPwd || !confirmPwd) {
+                ErrorHandler.showNotification('Please fill all password fields', 'error');
+                return;
+            }
+            
+            if (newPwd !== confirmPwd) {
+                ErrorHandler.showNotification('New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPwd.length < 4) {
+                ErrorHandler.showNotification('Password must be at least 4 characters', 'error');
+                return;
+            }
+            
+            try {
+                LoadingManager.showLoading(true);
+                
+                // Verify current password
+                const userProfile = getUserProfile();
+                if (userProfile.password !== currentPwd) {
+                    ErrorHandler.showNotification('Current password is incorrect', 'error');
+                    return;
+                }
+                
+                // Update password
+                updateUserProfile({ password: newPwd });
+                
+                // Clear inputs
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                
+                ErrorHandler.showNotification('Password changed successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'changing password');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        function exportData() {
+            try {
+                const STORAGE_KEY = 'mockDashboardData_v1';
+                const PROFILE_KEY = 'userProfiles_v1';
+                
+                const allData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                const allProfiles = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+                
+                const userData = allData[currentUserId] || {};
+                const userProfile = allProfiles[currentUserId] || {};
+                
+                const exportData = {
+                    email: currentUserId,
+                    profile: userProfile,
+                    data: userData,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `dashboard-backup-${currentUserId.split('@')[0]}-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                
+                URL.revokeObjectURL(url);
+                
+                ErrorHandler.showNotification('Data exported successfully', 'success');
+            } catch (error) {
+                ErrorHandler.handle(error, 'exporting data');
+            }
+        }
+
+        function importData() {
+            const fileInput = document.getElementById('importFileInput');
+            fileInput.click();
+            
+            fileInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    LoadingManager.showLoading(true);
+                    
+                    const text = await file.text();
+                    const importedData = JSON.parse(text);
+                    
+                    if (!importedData.data || !importedData.profile) {
+                        throw new Error('Invalid backup file format');
+                    }
+                    
+                    const confirmed = confirm(`Import data from ${importedData.email}?\\nThis will overwrite your current data for this account.`);
+                    if (!confirmed) {
+                        LoadingManager.showLoading(false);
+                        return;
+                    }
+                    
+                    // Import data
+                    const STORAGE_KEY = 'mockDashboardData_v1';
+                    const PROFILE_KEY = 'userProfiles_v1';
+                    
+                    const allData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                    const allProfiles = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+                    
+                    allData[currentUserId] = importedData.data;
+                    allProfiles[currentUserId] = importedData.profile;
+                    
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+                    localStorage.setItem(PROFILE_KEY, JSON.stringify(allProfiles));
+                    
+                    // Reload data
+                    loadMockData(currentUserId);
+                    
+                    // Reload all sections
+                    clearCache();
+                    await initializeApp();
+                    await loadSettings();
+                    
+                    ErrorHandler.showNotification('Data imported successfully! Refreshing...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } catch (error) {
+                    ErrorHandler.handle(error, 'importing data');
+                } finally {
+                    LoadingManager.showLoading(false);
+                    fileInput.value = '';
+                }
+            };
+        }
+
+        function clearAllData() {
+            const confirmed = confirm('⚠️ WARNING: This will permanently delete ALL your data!\\n\\nThis action cannot be undone.\\n\\nAre you sure?');
+            if (!confirmed) return;
+            
+            const doubleConfirm = confirm('This is your last chance!\\n\\nType your email to confirm deletion, or click Cancel.');
+            if (!doubleConfirm) return;
+            
+            try {
+                LoadingManager.showLoading(true);
+                
+                const STORAGE_KEY = 'mockDashboardData_v1';
+                const allData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                delete allData[currentUserId];
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+                
+                // Reset mock data
+                mockData = {
+                    bio: { fields: {} },
+                    documents: [],
+                    links: [],
+                    notes: { content: '', lastUpdated: new Date().toISOString() },
+                    todos: []
+                };
+                
+                persistMockData();
+                clearCache();
+                
+                ErrorHandler.showNotification('All data cleared', 'success');
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } catch (error) {
+                ErrorHandler.handle(error, 'clearing data');
+            } finally {
+                LoadingManager.showLoading(false);
+            }
+        }
+
+        // Make settings functions globally available
+        window.saveDashboardName = saveDashboardName;
+        window.changePassword = changePassword;
+        window.exportData = exportData;
+        window.importData = importData;
+        window.clearAllData = clearAllData;
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authUser');
+            // keep mock data in storage, but remove active user id
+            localStorage.removeItem('userId');
+            // redirect to login
+            window.location.replace('login.html');
+        }
+
+        // Git commands for initialization (uncomment to use)
+        /*
+        git init
+        git add .
+        git commit -m "Initial commit"
+        git branch -M main
+        git remote add origin https://github.com/USERNAME/REPO.git
+        git push -u origin main
+        */
+    </script>
+</body>
+</html>

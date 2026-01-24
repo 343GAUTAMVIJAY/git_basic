@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Personal Dashboard</title>
     <script>
-      // Route to login or dashboard depending on authentication
+      // Route to Firebase login
       (function(){
-        // Always go to the login page first so users can sign in explicitly.
-        // Dashboard will redirect to login if not authenticated.
-        window.location.replace('login.html');
+        window.location.replace('login-firebase.html');
       })();
     </script>
   </head>
   <body>
-    <p>Redirecting to <a href="mock-firebase-test.html">mock-firebase-test.html</a>. If you are not redirected, click the link.</p>
+    <p>Redirecting to login... If you are not redirected, <a href="login-firebase.html">click here</a>.</p>
   </body>
 </html>

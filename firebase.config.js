@@ -1,11 +1,11 @@
 // Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyDummyKeyForTesting",
-    authDomain: "dummy-project.firebaseapp.com",
-    projectId: "dummy-project-id",
-    storageBucket: "dummy-project.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:dummyappid"
+    apiKey: "AIzaSyBv7sht1z_C674KFtkWJVcFZrNSIVDglmY",
+    authDomain: "personal-dashboard-9b27f.firebaseapp.com",
+    projectId: "personal-dashboard-9b27f",
+    storageBucket: "personal-dashboard-9b27f.firebasestorage.app",
+    messagingSenderId: "847796579655",
+    appId: "1:847796579655:web:05005711f491f435c47062"
 };
 
 // Initialize Firebase
